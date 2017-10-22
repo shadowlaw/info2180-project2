@@ -4,7 +4,8 @@ var blank = ["300px", "300px"];
 
 function initail_state() {
     var puzzle_area = document.getElementById("puzzlearea").childNodes;
-    var puzzle_pieces = [];
+    var initial_state = [];
+
     var x = 0,
         y = 0,
         top = 0,
@@ -13,7 +14,7 @@ function initail_state() {
 
     for (let i = 0; i < puzzle_area.length; i++) {
         if (puzzle_area[i].nodeName == "DIV") {
-            puzzle_pieces.push(puzzle_area[i]);
+            initial_state.push([top.toString() + "px", left.toString() + "px"]);
             puzzle_area[i].className += "puzzlepiece";
             puzzle_area[i].setAttribute("style", `background-position: ${x}px ${y}px; top: ${top}px; left: ${left}px;`);
             x -= 100;
@@ -29,11 +30,11 @@ function initail_state() {
         }
     }
 
-    return puzzle_pieces
+    return initail_state
 }
 
 function is_movable(piece) {
-
+    return parseInt(piece.style.top) + 100 === parseInt(blank[0]) & parseInt(piece.style.left) === parseInt(blank[1]) | parseInt(piece.style.top) - 100 === parseInt(blank[0]) & parseInt(piece.style.left) === parseInt(blank[1]) | parseInt(piece.style.top) === parseInt(blank[0]) & parseInt(piece.style.left) - 100 === parseInt(blank[1]) | parseInt(piece.style.top) === parseInt(blank[0]) & parseInt(piece.style.left) + 100 === parseInt(blank[1])
 }
 
 function move_piece(piece, animate) {
@@ -66,12 +67,30 @@ function get_pieces() {
 }
 
 function main() {
-    var puzzle_pieces = initail_state();
+    var winning_state = initail_state();
+    var puzzle_pieces = get_pieces();
 
     document.getElementById("shufflebutton").onclick = function() {
         random_shuffle(puzzle_pieces);
         puzzle_pieces = get_pieces();
     }
 
+    for (var i = 0; i < puzzle_pieces.length; i++) {
+        puzzle_pieces[i].addEventListener("mouseover", function() {
+            if (is_movable(this)) {
+                this.className = "puzzlepiece movablepiece";
+            }
+        });
+
+        puzzle_pieces[i].addEventListener("mouseleave", function() {
+            this.className = "puzzlepiece";
+        });
+
+        puzzle_pieces[i].addEventListener("click", function() {
+            if (this.className.includes("movablepiece")) {
+                move_piece(this, true);
+            }
+        });
+    }
 
 }
