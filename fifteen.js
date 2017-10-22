@@ -84,7 +84,7 @@ function random_shuffle(pieces) {
 }
 
 function get_pieces() {
-    return document.querySelectorAll(".puzzlepiece");
+    return $(".puzzlepiece");
 }
 
 function main() {
