@@ -1,8 +1,9 @@
 window.onload = main;
 
 var blank = ["300px", "300px"];
+var start = false;
 
-function initail_state() {
+function start_state() {
     var puzzle_area = document.getElementById("puzzlearea").childNodes;
     var initial_state = [];
 
@@ -30,11 +31,23 @@ function initail_state() {
         }
     }
 
-    return initail_state
+    return initial_state
 }
 
 function is_movable(piece) {
     return parseInt(piece.style.top) + 100 === parseInt(blank[0]) & parseInt(piece.style.left) === parseInt(blank[1]) | parseInt(piece.style.top) - 100 === parseInt(blank[0]) & parseInt(piece.style.left) === parseInt(blank[1]) | parseInt(piece.style.top) === parseInt(blank[0]) & parseInt(piece.style.left) - 100 === parseInt(blank[1]) | parseInt(piece.style.top) === parseInt(blank[0]) & parseInt(piece.style.left) + 100 === parseInt(blank[1])
+}
+
+function check_for_win(winning_state, pieces) {
+    if (start) {
+        for (var i = 0; i < pieces.length; i++) {
+            if ((winning_state[i][0] !== pieces[i].style.top) | (winning_state[i][1] !== pieces[i].style.left)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
 }
 
 function move_piece(piece, animate) {
@@ -42,7 +55,15 @@ function move_piece(piece, animate) {
     blank_left = piece.style.left;
 
     if (animate) {
-        $(piece).animate({ "top": blank[0], "left": blank[1] }, "slow");
+        var winning_state = arguments[2];
+        var pieces = arguments[3];
+        $(piece).animate({ "top": blank[0], "left": blank[1] }, "slow", "linear", function() {
+            if (check_for_win(winning_state, pieces)) {
+                $(".explanation")[0].innerText = "You Win";
+                $(".explanation")[0].style.textAlign = "Center";
+            }
+        });
+
     } else {
         piece.style.top = blank[0];
         piece.style.left = blank[1];
@@ -63,15 +84,16 @@ function random_shuffle(pieces) {
 }
 
 function get_pieces() {
-    return $('.puzzlepiece');
+    return document.querySelectorAll(".puzzlepiece");
 }
 
 function main() {
-    var winning_state = initail_state();
+    var winning_state = start_state();
     var puzzle_pieces = get_pieces();
 
     document.getElementById("shufflebutton").onclick = function() {
         random_shuffle(puzzle_pieces);
+        start = true;
         puzzle_pieces = get_pieces();
     }
 
@@ -88,7 +110,7 @@ function main() {
 
         puzzle_pieces[i].addEventListener("click", function() {
             if (this.className.includes("movablepiece")) {
-                move_piece(this, true);
+                move_piece(this, true, winning_state, puzzle_pieces);
             }
         });
     }
