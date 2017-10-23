@@ -2,6 +2,7 @@
 - Animations and/or transitions (Grade)
 - End-of-game notification
 - Game time
+- Multiple backgrounds
 */
 window.onload = main;
 
@@ -12,8 +13,8 @@ var moves = 0; //holds the number of moves made
 var start_time = 0; //Game start time
 var timer; // variable for timer 
 var total_time = 0; // total gameplay time
-var best_time = 0;  
-var best_moves =0;
+var best_time = 0;
+var best_moves = 0;
 
 //Maze piece Initialization function and returns initial maze state
 function start_state() {
@@ -76,10 +77,10 @@ function move_piece(piece, animate) {
         var pieces = arguments[3];
         $(piece).animate({ "top": blank[0], "left": blank[1] }, "slow", "linear", function() {
             if (check_for_win(winning_state, pieces)) {
-                if(best_time < total_time){
+                if (best_time < total_time) {
                     best_time = total_time;
                 }
-                if(best_moves < moves){
+                if (best_moves < moves) {
                     best_moves = moves
                 }
                 var win_string = `You Win\nTotal Time: ${seconds_to_time(total_time)} Number of moves: ${moves}\nBest Time: ${seconds_to_time(best_time)} Best Number of Moves: ${best_moves}`;
@@ -114,7 +115,7 @@ function get_pieces() {
 }
 
 //returns HH:MM:SS time format from seconds
-function seconds_to_time(seconds){
+function seconds_to_time(seconds) {
     var date = new Date(null);
     date.setSeconds(seconds);
     return date.toISOString().substr(11, 8);
@@ -133,12 +134,50 @@ function update_stats() {
     $(".explanation")[0].innerHTML = `Time: ${update_time()} Moves: ${moves}`;
 }
 
+function add_background_seletor() {
+    var background_form = "<form align='Center'>\
+    <p align='Center'>Select a background image<p>\
+    <input type = 'radio' name = 'bg' value = ''/> Mark of the outsider\
+    <input type = 'radio' name = 'bg' value = '1'/>Orchid\
+    <input type = 'radio' name = 'bg' value = '2'/>Fat cat\
+    <input type = 'radio' name = 'bg' value = '3'/>One punch man\
+    </form>";
+
+    $("#overall").before(background_form);
+
+}
+
+function change_bg(value) {
+    var pieces = get_pieces();
+    
+    for (var i = 0; i < pieces.length; i++){
+        pieces[i].style.backgroundImage = `url('background${value}.jpg')`;
+    }
+}
+
+function shuffle_image(){
+    var value = Math.floor(Math.random()*4)
+    if(value === 0){
+        value = "";
+    }
+    change_bg(value);
+}
+
 function main() {
     var winning_state = start_state();
     var puzzle_pieces = get_pieces();
+    add_background_seletor();
+    var bg_form_items = $("form")[0].elements;
+
+    for (var i = 0; i < bg_form_items.length; i++) {
+        bg_form_items[i].addEventListener("click", function(){
+            change_bg(this.value)
+        });
+    }
 
     document.getElementById("shufflebutton").onclick = function() {
         random_shuffle(puzzle_pieces);
+        shuffle_image();
         start = true;
         moves = 0;
         puzzle_pieces = get_pieces();
