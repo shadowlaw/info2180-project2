@@ -1,8 +1,8 @@
 /*Additional features:
-- Animations and/or transitions (Grade)
+- Animations and/or transitions 
 - End-of-game notification
 - Game time
-- Multiple backgrounds
+- Multiple backgrounds (Grade)
 */
 window.onload = main;
 
